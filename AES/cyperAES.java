@@ -5,7 +5,7 @@ class AES {
             { 'j', ';', '*', '!', '@', 'w', 'e', '4', } };
     // 742~!#$kunal%^$1};
 
-    public void substitute(char[][] TxtGrid) {
+    public void substitute(char[][] txtGrid) {
         String[][] spansionBox = new String[][] {
                 { "63", "7c", "77", "7b", "f2", "6b", "6f", "c5", "30", "01", "67", "2b", "fe", "d7", "ab", "76" },
                 { "ca", "82", "c9", "7d", "fa", "59", "47", "f0", "ad", "d4", "a2", "af", "9c", "a4", "72", "c0" },
@@ -24,6 +24,27 @@ class AES {
                 { "e1", "f8", "98", "11", "69", "d9", "8e", "94", "9b", "le", "87", "e9", "ce", "55", "28", "df" },
                 { "8c", "a1", "89", "0d", "bf", "e6", "42", "68", "41", "99", "2d", "0f", "b0", "54", "bb", "16" }, };
 
+        // now we have to do Operation of substitute byte
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                // firstly take the character from input stream
+                char chr = txtGrid[r][c];
+                // then convert Character to hexadecimal string
+                String hexStr = Integer.toHexString(chr);
+                // now divide the hex string into two subpart 1hex value and 2hex value
+                // String divion in two half
+                // e.g. hexCode1 = "4"; hexCode2 = "d"
+                String hexCode1 = hexStr.substring(0, 1); // give me first 4bits into hex code from string
+                String hexCode2 = hexStr.substring(1, 2); // give me first 4bits into hex code from string
+
+                // now get the integer index from hexcode to find the x and y coordinate to
+                // subsitute
+                int rowSbIdx = Integer.valueOf(hexCode1, 16).intValue();
+                int colSbIdx = Integer.valueOf(hexCode2, 16).intValue();
+                // convert hexCode to character then store to given grid.
+                txtGrid[r][c] = (char) Integer.parseInt(spansionBox[rowSbIdx][colSbIdx], 16);
+            }
+        }
     }
 
 }
