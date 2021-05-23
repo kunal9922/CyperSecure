@@ -1,9 +1,6 @@
 import java.util.Scanner;
 
 class AES {
-    private char[][] aesKey = { { '$', '2', 'L', 'o', '~', '2', '@', '4' },
-            { 'j', ';', '*', '!', '@', 'w', 'e', '4', } };
-    // 742~!#$kunal%^$1};
 
     public void substitute(char[][] txtGrid) {
         String[][] spansionBox = new String[][] {
@@ -21,7 +18,7 @@ class AES {
                 { "e7", "c8", "37", "6d", "8d", "d5", "4e", "a9", "6c", "56", "f4", "ea", "65", "7a", "ae", "08" },
                 { "ba", "78", "25", "2e", "1c", "a6", "b4", "c6", "e8", "dd", "74", "lf", "4b", "bd", "8b", "8a" },
                 { "70", "3e", "b5", "66", "48", "03", "f6", "0e", "61", "35", "57", "b9", "86", "c1", "1d", "9e" },
-                { "e1", "f8", "98", "11", "69", "d9", "8e", "94", "9b", "le", "87", "e9", "ce", "55", "28", "df" },
+                { "e1", "f8", "98", "11", "69", "d9", "8e", "94", "9b", "le", "87", "e9", "ce", "55", "28", "7e" },
                 { "8c", "a1", "89", "0d", "bf", "e6", "42", "68", "41", "99", "2d", "0f", "b0", "54", "bb", "16" }, };
 
         // now we have to do Operation of substitute byte
@@ -45,6 +42,30 @@ class AES {
                 txtGrid[r][c] = (char) Integer.parseInt(spansionBox[rowSbIdx][colSbIdx], 16);
             }
         }
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                System.out.print(txtGrid[i][j] + " ");
+            }
+            System.out.println("");
+        }
+    }
+
+    public char[][] shiftRows(char[][] ciper) {
+        int count;
+        for (int row = 1; row < 4; row++) { // run over the rows
+
+            // byte shifting row by row
+            // this loop will count how many of times we need to shift bytes to the left
+            for (int shiftCount = row; shiftCount > 0; shiftCount -= 1) {
+                char temp = ciper[row][0];
+                for (int col = 0; col <= 2; col++) {
+                    ciper[row][col] = ciper[row][1 + col];
+                }
+                ciper[row][3] = temp;
+            }
+        }
+
+        return ciper; // return shifted block of bytes
     }
 
 }
@@ -74,6 +95,15 @@ public class cyperAES {
             for (int c = 0; c < 4; c++) {
                 System.out.print(plainTxtGrid[r][c] + " ");
             }
+            System.out.println("");
+        }
+        AES cyperGen = new AES();
+        plainTxtGrid = cyperGen.shiftRows(plainTxtGrid);
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                System.out.print(plainTxtGrid[r][c] + " ");
+            }
+            System.out.println("");
         }
 
     }
