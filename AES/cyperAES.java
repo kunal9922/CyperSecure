@@ -55,11 +55,29 @@ class AES {
                 for (int col = 0; col <= 2; col++) {
                     state[row][col] = state[row][1 + col];
                 }
-                state[row][3] = temp;
+                state[row][3] = temp; // store temp var value into last index of state.
             }
         }
 
         return state; // return shifted block of bytes
+    }
+
+    public char[][] invShiftRows(char[][] state) {
+        for (int row = 1; row < 4; row++) { // run over the rows
+
+            // byte shifting row by row
+            // this loop will count how many of times we need to shift bytes to the right
+            // side
+            for (int shiftCount = row; shiftCount > 0; shiftCount -= 1) {
+                char temp = state[row][3]; // store last value of state in temp variable
+                for (int col = 3; col >= 1; col--) {
+                    state[row][col] = state[row][col - 1];
+                }
+                state[row][0] = temp; // store temp var value into first index of state.
+            }
+        }
+
+        return state; // return inverse shifted block of bytes
     }
 
     public char[][] invSubstitute(char[][] state) {
@@ -128,6 +146,7 @@ public class cyperAES {
                     plainTxtGrid[r][c] = 'Z'; // Input string will be end then add dummy char at the end
             }
         }
+        System.out.println("orignal text ");
         for (int r = 0; r < 4; r++) {
             for (int c = 0; c < 4; c++) {
                 System.out.print(plainTxtGrid[r][c] + " ");
@@ -136,6 +155,7 @@ public class cyperAES {
         }
 
         AES cyperGen = new AES();
+
         char subtiGrid[][] = cyperGen.substitute(plainTxtGrid);
         System.out.println("Subsitute");
         for (int r = 0; r < 4; r++) {
@@ -144,6 +164,25 @@ public class cyperAES {
             }
             System.out.println("");
         }
+
+        char shiftGrid[][] = cyperGen.shiftRows(plainTxtGrid);
+        System.out.println("shift grid");
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                System.out.print(shiftGrid[r][c] + " ");
+            }
+            System.out.println("");
+        }
+
+        char invShiftGrid[][] = cyperGen.invShiftRows(shiftGrid);
+        System.out.println("Inv shift grid");
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                System.out.print(invShiftGrid[r][c] + " ");
+            }
+            System.out.println("");
+        }
+
         char invSubtiGrid[][] = cyperGen.invSubstitute(subtiGrid);
         System.out.println(" inv Subsitute");
         for (int r = 0; r < 4; r++) {
