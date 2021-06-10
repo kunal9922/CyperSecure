@@ -2,6 +2,9 @@ import java.util.Scanner;
 
 class AES {
     private int round = 1;
+    private String RC[] = { "01", "02", "04", "08", "08", "10", "20", "40", "80", "1B", "36", "6C", "D8", "AB", "4D",
+            "9A", };
+
     final private String[][] sBox = new String[][] {
             { "63", "7c", "77", "7b", "f2", "6b", "6f", "c5", "30", "01", "67", "2b", "fe", "d7", "ab", "76" },
             { "ca", "82", "c9", "7d", "fa", "59", "47", "f0", "ad", "d4", "a2", "af", "9c", "a4", "72", "c0" },
@@ -78,9 +81,7 @@ class AES {
          * round and is defined as Rcon[j] = (RC[j], 0, 0, 0),
          */
 
-        String RC[] = { "01", "02", "04", "08", "08", "10", "20", "40", "80", "1B", "36" };
-
-        char roundKey = (char) Integer.parseInt(RC[this.round], 16);
+        char roundKey = (char) Integer.parseInt(this.RC[this.round], 16);
         char[] rcList = { roundKey, '0', '0', '0' }; // making the round constant array for Xor
 
         // Do Exor of the cipherWord with the rcList
@@ -208,7 +209,7 @@ class AES {
 
 }
 
-public class cyperAES {
+public class CyperAES {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter the text to securly Encrypt");
@@ -226,7 +227,7 @@ public class cyperAES {
                     plainTxtGrid[r][c] = plainText.charAt(charAtCount);
                     charAtCount++;
                 } else
-                    plainTxtGrid[r][c] = 'Z'; // Input string will be end then add dummy char at the end
+                    plainTxtGrid[r][c] = '~'; // Input string will be end then add dummy char at the end
             }
         }
         System.out.println("orignal text ");
@@ -261,12 +262,51 @@ public class cyperAES {
          */
         char[][] key = { { '3', 'f', 'r', 't' }, { 'd', 'c', 'c', 'w' }, { 'r', 'c', '6', '2' },
                 { '5', '7', 'b', '@' } };
-        char[][] keysExp = cyperGen.keyExpand(key);
-        for (int r = 0; r < 2; r++) {
-            for (int c = 0; c < 2; c++) {
-                System.out.print(keysExp[r][c] + " ");
+        // char[][] keysExp = cyperGen.keyExpand(key);
+        // System.out.println(keysExp.length);
+        // for (int r = 0; r < 4; r++) {
+        // for (int c = 0; c < 4; c++) {
+        // System.out.print((char) (plainTxtGrid[r][c] ^ keysExp[r][c]) + " ");
+        // plainTxtGrid[r][c] = (char) (plainTxtGrid[r][c] ^ keysExp[r][c]);
+        // }
+        // System.out.println("");
+        // }
+        // System.out.println("Decrypt cyper");
+        // for (int r = 0; r < 4; r++) {
+        // for (int c = 0; c < 4; c++) {
+        // System.out.print((char) (plainTxtGrid[r][c] ^ keysExp[r][c]) + " ");
+        // // plainTxtGrid[r][c] = (char)(plainTxtGrid[r][c] ^ keysExp[r][c]);
+        // }
+        // System.out.println("");
+        // }
+        // raw string
+        String msg = " hello kunal kese ho yrr i'm from india i love to listen songs we are happy to say I'm a good person";
+        // fetching the length of the raw string
+        int lenMsg = msg.length();
+        System.out.println("msg length: " + lenMsg);
+        // finding the how many number of 4x4 martrix are need to be.
+        int setSize = (int) lenMsg / 16;
+        System.out.println("Msg setSize : " + setSize);
+
+        // declaring the matrix to store the string as a state matrix
+        char[][][] plainMtrx = new char[4][4][setSize];
+        charAtCount = 0; // counter to count no. of character is to travers.
+        for (int countMatrix = 0; countMatrix < setSize; countMatrix++) {
+            for (int r = 0; r < 4; r++) {
+                for (int c = 0; c < 4; c++) {
+                    if (charAtCount < lenMsg) {
+                        // convert message msg text String into Char array
+                        plainMtrx[r][c][countMatrix] = msg.charAt(charAtCount);
+                        charAtCount++;
+                        System.out.print(plainMtrx[r][c][countMatrix] + " ");
+                    } else // assign dummy character to the end of string if msg string lenght is not equal
+                           // to matrix length
+                        plainMtrx[r][c][countMatrix] = '~';
+
+                }
+                System.out.println("");
             }
-            System.out.println("");
+            System.out.println("matrix number : " + countMatrix);
         }
 
     }
