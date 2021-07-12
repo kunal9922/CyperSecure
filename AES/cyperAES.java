@@ -41,6 +41,22 @@ class AES {
             { "a0", "e0", "eb", "4d", "ae", "2a", "f5", "b0", "c8", "eb", "bb", "3c", "83", "53", "99", "61" },
             { "17", "2b", "04", "7e", "ba", "77", "d6", "26", "e1", "69", "14", "63", "55", "21", "0c", "7d" } };
 
+    // This 4x4matrix will use for to encrypt text in mix column round
+    final private int[][] mixColMtrx = { { 02, 03, 01, 01 }, { 01, 02, 03, 01 }, { 01, 01, 02, 03 },
+            { 03, 01, 01, 02 } };
+
+    final private int[][] mixColInvMtrx = { { 0x0E, 0x0B, 0x0D, 0x09 }, { 0x09, 0x0E, 0x0B, 0x0D },
+            { 0x0D, 0x09, 0x0E, 0x0B }, { 0x0B, 0x0D, 0x09, 0x0E } };
+
+    public char[][] addRoundKey(char[][] state, char[][] key) {
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                state[r][c] = (char) (state[r][c] ^ key[r][c]);
+            }
+        }
+        return state;
+    }
+
     public char[] g(char[] word) {
         /*
          * RotWord performs a one-byte circular left shift on a word. This means that an
@@ -159,7 +175,17 @@ class AES {
     }
 
     public char[][] mixCol(char[][] state) {
-        // declare of matrix which finite multiplication in nature
+        // step1: add code to matrix multiplication
+        int multiAns = 0;
+
+        for (int rIdx = 0; rIdx < 4; rIdx++) {
+            for (int cIdx = 0; cIdx < 4; cIdx++) {
+                for (int k = 0; k < 4; k++) {
+                    state[rIdx][cIdx] = (char) (mixColMtrx[rIdx][k] * state[k][cIdx]);
+                }
+
+            }
+        }
         return state;
     }
 
@@ -209,7 +235,18 @@ class AES {
 
 }
 
-public class CyperAES {
+class CyperAES {
+    public void passMtrxToAes(char[][] state) {
+        AES cyperGen = new AES(); // Object to call our AES feature
+        char[][] key1 = { { '3', 'f', 'r', 't' }, { 'd', 'c', 'c', 'w' }, { 'r', 'c', '6', '2' },
+                { '5', '7', 'b', '@' } };
+        char[][] key2 = { { '$', '2', '5', '?' }, { '[', 'a', 'g', '7' }, { '~', 'f', 'r', '3' },
+                { '>', '3', '1', 'v' } };
+        // first two round done mannualy by us
+        cyperGen.
+
+    }
+
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter the text to securly Encrypt");
@@ -238,7 +275,6 @@ public class CyperAES {
             System.out.println("");
         }
 
-        AES cyperGen = new AES();
         /*
          * char subtiGrid[][] = cyperGen.substitute(plainTxtGrid);
          * System.out.println("Subsitute"); for (int r = 0; r < 4; r++) { for (int c =
@@ -260,25 +296,7 @@ public class CyperAES {
          * c = 0; c < 4; c++) { System.out.print(invSubtiGrid[r][c] + " "); }
          * System.out.println(""); }
          */
-        char[][] key = { { '3', 'f', 'r', 't' }, { 'd', 'c', 'c', 'w' }, { 'r', 'c', '6', '2' },
-                { '5', '7', 'b', '@' } };
-        // char[][] keysExp = cyperGen.keyExpand(key);
-        // System.out.println(keysExp.length);
-        // for (int r = 0; r < 4; r++) {
-        // for (int c = 0; c < 4; c++) {
-        // System.out.print((char) (plainTxtGrid[r][c] ^ keysExp[r][c]) + " ");
-        // plainTxtGrid[r][c] = (char) (plainTxtGrid[r][c] ^ keysExp[r][c]);
-        // }
-        // System.out.println("");
-        // }
-        // System.out.println("Decrypt cyper");
-        // for (int r = 0; r < 4; r++) {
-        // for (int c = 0; c < 4; c++) {
-        // System.out.print((char) (plainTxtGrid[r][c] ^ keysExp[r][c]) + " ");
-        // // plainTxtGrid[r][c] = (char)(plainTxtGrid[r][c] ^ keysExp[r][c]);
-        // }
-        // System.out.println("");
-        // }
+
         // raw string
         String msg = " hello kunal kese ho yrr i'm from india i love to listen songs we are happy to say I'm a good person";
         // fetching the length of the raw string
@@ -292,6 +310,7 @@ public class CyperAES {
         char[][][] plainMtrx = new char[4][4][setSize];
         charAtCount = 0; // counter to count no. of character is to travers.
         for (int countMatrix = 0; countMatrix < setSize; countMatrix++) {
+            System.out.println("matrix number : " + countMatrix);
             for (int r = 0; r < 4; r++) {
                 for (int c = 0; c < 4; c++) {
                     if (charAtCount < lenMsg) {
@@ -306,7 +325,31 @@ public class CyperAES {
                 }
                 System.out.println("");
             }
-            System.out.println("matrix number : " + countMatrix);
+            /*
+             * for() to Fetch array from 3Darray
+             */
+            CyperAES aes = new CyperAES();
+            String cyperTxt;
+            char[][] pasMtrx = new char[4][4];
+            for (int stateCount = 0; stateCount < setSize; stateCount++) {
+                for (int r = 0; r < 4; r++) {
+                    for (int c = 0; c < 4; c++) {
+                        pasMtrx[r][c] = plainMtrx[r][c][stateCount];
+                    }
+                }
+                // Encrypt the matrix
+                pasMtrx = aes.passMtrxToAes(pasMtrx);
+                // appending the encrpted matrix to the string
+                for (int r = 0; r < 4; r++) {
+                    for (int c = 0; c < 4; c++) {
+                        cyperTxt = cyperTxt + pasMtrx[r][c];
+                    }
+                }
+            }
+
+            // Print the cyper text String
+            System.out.println(cyperTxt);
+
         }
 
     }
