@@ -236,66 +236,43 @@ class AES {
 }
 
 class CyperAES {
-    public void passMtrxToAes(char[][] state) {
+    public char[][] passMtrxToAes(char[][] state) {
+
         AES cyperGen = new AES(); // Object to call our AES feature
         char[][] key1 = { { '3', 'f', 'r', 't' }, { 'd', 'c', 'c', 'w' }, { 'r', 'c', '6', '2' },
                 { '5', '7', 'b', '@' } };
         char[][] key2 = { { '$', '2', '5', '?' }, { '[', 'a', 'g', '7' }, { '~', 'f', 'r', '3' },
                 { '>', '3', '1', 'v' } };
-        // first two round done mannualy by us
-        cyperGen.
 
+        // Initial to add round key.
+        state = cyperGen.addRoundKey(state, key1);
+        // first 1 round done mannualy by us
+        state = cyperGen.substitute(state);
+        state = cyperGen.shiftRows(state);
+        state = cyperGen.addRoundKey(state, key1);
+        // Round 2
+        state = cyperGen.substitute(state);
+        state = cyperGen.shiftRows(state);
+        state = cyperGen.addRoundKey(state, key2);
+        key2 = cyperGen.keyExpand(key2);
+
+        // Doing remainng rounds.
+        for (int roundCount = 3; roundCount <= 14; roundCount++) {
+            state = cyperGen.substitute(state);
+            state = cyperGen.shiftRows(state);
+            state = cyperGen.addRoundKey(state, key2);
+            key2 = cyperGen.keyExpand(key2);
+        }
+        return state;
     }
 
     public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Enter the text to securly Encrypt");
-        String plainText = scan.next();
+        // Scanner scan = new Scanner(System.in);
+        // System.out.println("Enter the text to securly Encrypt");
+        // String msg = scan.next();
 
         // create an array of size 32 byte to store each character from given sting and
         // do encryption
-        char[][] plainTxtGrid = new char[4][4];
-        int charAtCount = 0;
-
-        for (int r = 0; r < 4; r++) {
-            for (int c = 0; c < 4; c++) {
-                if (charAtCount < plainText.length()) {
-                    // convert plain text String into Char array
-                    plainTxtGrid[r][c] = plainText.charAt(charAtCount);
-                    charAtCount++;
-                } else
-                    plainTxtGrid[r][c] = '~'; // Input string will be end then add dummy char at the end
-            }
-        }
-        System.out.println("orignal text ");
-        for (int r = 0; r < 4; r++) {
-            for (int c = 0; c < 4; c++) {
-                System.out.print(plainTxtGrid[r][c] + " ");
-            }
-            System.out.println("");
-        }
-
-        /*
-         * char subtiGrid[][] = cyperGen.substitute(plainTxtGrid);
-         * System.out.println("Subsitute"); for (int r = 0; r < 4; r++) { for (int c =
-         * 0; c < 4; c++) { System.out.print(plainTxtGrid[r][c] + " "); }
-         * System.out.println(""); }
-         * 
-         * char shiftGrid[][] = cyperGen.shiftRows(plainTxtGrid);
-         * System.out.println("shift grid"); for (int r = 0; r < 4; r++) { for (int c =
-         * 0; c < 4; c++) { System.out.print(shiftGrid[r][c] + " "); }
-         * System.out.println(""); }
-         * 
-         * char invShiftGrid[][] = cyperGen.invShiftRows(shiftGrid);
-         * System.out.println("Inv shift grid"); for (int r = 0; r < 4; r++) { for (int
-         * c = 0; c < 4; c++) { System.out.print(invShiftGrid[r][c] + " "); }
-         * System.out.println(""); }
-         * 
-         * char invSubtiGrid[][] = cyperGen.invSubstitute(subtiGrid);
-         * System.out.println(" inv Subsitute"); for (int r = 0; r < 4; r++) { for (int
-         * c = 0; c < 4; c++) { System.out.print(invSubtiGrid[r][c] + " "); }
-         * System.out.println(""); }
-         */
 
         // raw string
         String msg = " hello kunal kese ho yrr i'm from india i love to listen songs we are happy to say I'm a good person";
@@ -303,54 +280,70 @@ class CyperAES {
         int lenMsg = msg.length();
         System.out.println("msg length: " + lenMsg);
         // finding the how many number of 4x4 martrix are need to be.
-        int setSize = (int) lenMsg / 16;
+        int setSize;
+        if (lenMsg % 16 == 0)
+            setSize = (int) lenMsg / 16;
+        else
+            setSize = (int) (lenMsg / 16) + 1;
+
         System.out.println("Msg setSize : " + setSize);
 
         // declaring the matrix to store the string as a state matrix
         char[][][] plainMtrx = new char[4][4][setSize];
-        charAtCount = 0; // counter to count no. of character is to travers.
+        int charAtCount = 0; // counter to count no. of character is to travers.
+
         for (int countMatrix = 0; countMatrix < setSize; countMatrix++) {
             System.out.println("matrix number : " + countMatrix);
             for (int r = 0; r < 4; r++) {
                 for (int c = 0; c < 4; c++) {
+
                     if (charAtCount < lenMsg) {
                         // convert message msg text String into Char array
                         plainMtrx[r][c][countMatrix] = msg.charAt(charAtCount);
                         charAtCount++;
                         System.out.print(plainMtrx[r][c][countMatrix] + " ");
-                    } else // assign dummy character to the end of string if msg string lenght is not equal
-                           // to matrix length
+                    } else { // assign dummy character to the end of string if msg string lenght is not equal
+                             // to matrix length
                         plainMtrx[r][c][countMatrix] = '~';
+                        System.out.print(plainMtrx[r][c][countMatrix] + " ");
+                    }
 
+                }
+
+                System.out.println("");
+            }
+        }
+        /*
+         * for() to Fetch array from 3Darray
+         */
+        CyperAES aes = new CyperAES();
+        System.out.println("Done!");
+        // String that will contain the cyper text characters.
+        String cyperTxt = "";
+        char[][] pasMtrx = new char[4][4];
+
+        for (int stateCount = 0; stateCount < setSize; stateCount++) {
+            for (int r = 0; r < 4; r++) {
+                for (int c = 0; c < 4; c++) {
+                    pasMtrx[r][c] = plainMtrx[r][c][stateCount];
+                }
+            }
+            System.out.println("Done2!");
+            // Encrypt the matrix
+            pasMtrx = aes.passMtrxToAes(pasMtrx);
+            // appending the encrpted matrix to the string
+            for (int r = 0; r < 4; r++) {
+                for (int c = 0; c < 4; c++) {
+                    System.out.print(pasMtrx[r][c]);
+                    cyperTxt = cyperTxt + pasMtrx[r][c];
                 }
                 System.out.println("");
             }
-            /*
-             * for() to Fetch array from 3Darray
-             */
-            CyperAES aes = new CyperAES();
-            String cyperTxt;
-            char[][] pasMtrx = new char[4][4];
-            for (int stateCount = 0; stateCount < setSize; stateCount++) {
-                for (int r = 0; r < 4; r++) {
-                    for (int c = 0; c < 4; c++) {
-                        pasMtrx[r][c] = plainMtrx[r][c][stateCount];
-                    }
-                }
-                // Encrypt the matrix
-                pasMtrx = aes.passMtrxToAes(pasMtrx);
-                // appending the encrpted matrix to the string
-                for (int r = 0; r < 4; r++) {
-                    for (int c = 0; c < 4; c++) {
-                        cyperTxt = cyperTxt + pasMtrx[r][c];
-                    }
-                }
-            }
-
-            // Print the cyper text String
-            System.out.println(cyperTxt);
-
         }
 
+        // Print the cyper text String
+        System.out.println(cyperTxt);
+
     }
+
 }
